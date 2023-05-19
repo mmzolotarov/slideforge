@@ -7,3 +7,5 @@ Does not require any installation steps except copying files and putting your op
 create folders:
 images
 output
+
+Not optimized for mobile phones yet
