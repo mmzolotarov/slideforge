@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>1-Click AI Presentation Generator - Slideforge</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="style2.css">
+	<link href='https://fonts.googleapis.com/css?family=Poppins' rel='stylesheet'>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
+<script src="script.js"></script>
+
+
+</head>
+<body>
+    
+     <style>
+    .loader {
+      border: 16px solid #f3f3f3;
+      border-top: 16px solid #3498db;
+      border-radius: 50%;
+      width: 120px;
+      height: 120px;
+      animation: spin 2s linear infinite;
+      margin: 20px auto;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+<div id="loader" class="loader" style="display: none;"></div>
+  <div id="loadertext" class="subheading" style="display: none;">Your presentation is being generated. It may take up to 30 seconds.</div>
+   <div id="success" class="subheading" style="display: none;">Congratulations, your presentation has been successfully generated! Your download should automatically start in a few seconds.
+   <center>	<button class="button" id="reload" onclick="window.location.reload();">Generate a new presentation</button></center>
+   </div>
+    	<div class="container" id="main">
+<div class="glassmorphism">
+<div class="pre-header"></div>
+ 
+
+	<div class="container">
+<h1 id="title">
+		<span id="slide">SLIDE</span>
+		<span id="forge">FORGE</span>
+	</h1><div class="subheading">Generate your presentation in 1 click!</div>
+		<div class="row">
+			<div class="col">
+				<div class="content">
+					
+					
+					<div class="subsubheading">You can use either a short or a long prompt, for example:
+ <div class="prompts"><ul>
+ <li><span class="accent">Short</span>&nbsp;&nbsp;Critical thinking</li>
+
+  <li><span class="accent">Long</span>&nbsp;&nbsp;&nbsp;A presentation about Kharkiv. I am a Ukrainian asylum seeker in the UK and need it for English lessons. Kharkiv is my hometown. There is war now but I want to pay attention to the city before the war and to the positive moments.</li>
+</ul> </div></div>
+					<textarea class="textarea" id="prompt" placeholder="Enter your text" maxlength="400"></textarea>
+					<span id="charCount">Characters: 0 / 400</span>
+					<button class="button" onclick="generateSlides()">Generate</button>
+				</div>
+			</div>
+			<div class="col" id="example">
+				<img src="img/example.jpg" alt="Landing Page Image">
+			</div>
+		</div>
+	</div>
+
+	<script>
+    // JavaScript code for parallax effect
+    window.addEventListener('scroll', function() {
+      const objects = document.querySelectorAll('.object');
+      objects.forEach(function(object) {
+        const value = object.getAttribute('data-value');
+        const yPos = window.scrollY * value / 10;
+        object.style.transform = 'translate3d(0, ' + yPos + 'px, 0)';
+      });
+    });
+	
+	
+	
+	
+	
+
+
+const textarea = document.getElementById('prompt');
+const maxLength = 400;
+const charCount = document.getElementById('charCount');
+
+textarea.addEventListener('input', function() {
+  const currentLength = textarea.value.length;
+  charCount.textContent = `Characters: ${currentLength} / ${maxLength}`;
+  
+  if (currentLength > maxLength) {
+    textarea.value = textarea.value.slice(0, maxLength);
+    charCount.textContent = `Characters: ${maxLength} / ${maxLength} `;
+  }
+});
+
+
+
+	
+
+
+
+
+  </script>
+	
+<footer>
+
+  <div class="footer-inner">
+    <p>&copy; 2023 Slideforge</p>
+	 
+    <div class="social-links">
+      <a href="https://www.linkedin.com/in/mykola-zolotarov-8994911b0/" target="_blank"><i class="fab fa-linkedin"></i></a>
+      <a href="https:instagram.com/mmzolotarov/" target="_blank"><i class="fab fa-instagram"></i></a>
+	  <a href="mailto:“mykola.zolotarov@icloud.com">mykola.zolotarov@icloud.com</a>
+    </div>
+  </div>
+</footer>
+
+ 
+  <script>
+  
+  
+    // Function to search for images on Unsplash and download them to the server
+    async function searchAndDownloadImages(captions) {
+      const accessKey = 'W0FEQHN2U3A3CAK-RSwJ8CP-CG6bx2qpPlO9e7Sbhhg';
+      const apiUrl = `https://api.unsplash.com/search/photos?query=`;
+
+      try {
+        document.getElementById('loader').style.display = 'block';
+        const imageUrls = [];
+
+        for (const caption of captions) {
+          const response = await fetch(`${apiUrl}${encodeURIComponent(caption)}`, {
+            headers: {
+              Authorization: `Client-ID ${accessKey}`
+            }
+          });
+
+          const data = await response.json();
+
+          if (data.results.length > 0) {
+            const imageUrl = data.results[0].urls.regular;
+            imageUrls.push(imageUrl);
+
+            // Download the image and send it to the server
+            const imageBlob = await fetch(imageUrl).then((response) => response.blob());
+            const formData = new FormData();
+            formData.append('image', imageBlob, 'image.jpg');
+
+            await axios.post('upload_image.php', formData, {
+              headers: {
+                'Content-Type': 'multipart/form-data'
+              }
+            });
+          }
+        }
+
+        document.getElementById('loader').style.display = 'none';
+        return imageUrls;
+      } catch (error) {
+        console.error('Error:', error);
+        document.getElementById('loader').style.display = 'none';
+        return [];
+      }
+    }
+
+function generateSlides() {
+      document.getElementById('loadertext').style.display = 'block';
+  document.getElementById('loader').style.display = 'block';
+   document.getElementById('main').style.display = 'none';
+   document.body.style.backgroundPosition = "unset";
+  const prompt = `Please generate text for a PowerPoint presentation about: ${document.getElementById('prompt').value}
+    Provide the output in the following format:
+    {
+      "slides": [
+        {
+          "id": "slide1",
+          "content": "slide 1 content", //replace it with the actual content. Don't include the slide id and caption to the content. It should be about 350 symbols.
+          "caption": "Slide 1 caption", //replace it with the actual caption. Don't include the slide id to the caption.
+          "image": "slide 1 image" //repace it with a search query for the image stock that will illustrate this slide. It should be more general to be sure that the image will be found.
+        },
+        {
+          "id": "slide2",
+          "content": "slide 2 content",
+          "caption": "Slide 2 caption",
+          "image": "slide 2 image"
+        },
+        ...
+      ]
+    }`;
+
+  const apiKey = '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'; // Replace with your OpenAI API Key
+
+  const headers = {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${apiKey}`
+  };
+
+  const payload = {
+    model: 'gpt-3.5-turbo',
+    messages: [{ role: 'user', content: prompt }],
+    temperature: 0.7
+  };
+
+  axios.post('https://api.openai.com/v1/chat/completions', payload, { headers })
+    .then(async (response) => {
+      const completion = response.data.choices[0].message.content;
+      console.log('Completion:', completion);
+
+      const slides = JSON.parse(completion).slides;
+      const captions = slides.map((slide) => slide.caption);
+       const images = slides.map((slide) => slide.image);
+      const imageUrls = await searchAndDownloadImages(images);
+      console.log('Slides:', slides);
+      console.log('Image URLs:', imageUrls);
+
+
+ generateAndRedirect(slides, captions, imageUrls);
+   document.getElementById('loadertext').style.display = 'none';
+      document.getElementById('loader').style.display = 'none';
+         document.getElementById('success').style.display = 'block';
+                  document.getElementById('reload').style.display = 'block';
+    })
+    .catch((error) => {
+      console.error('Error:', error);
+      document.getElementById('loader').style.display = 'none';
+    });
+    
+}
+function generateAndRedirect(slides, captions, imageUrls) {
+  const pptx = new PptxGenJS();
+
+  // Generate slides using pptxgenjs
+  for (let i = 0; i < slides.length; i++) {
+    const slide = slides[i];
+    const caption = captions[i];
+    const imageUrl = imageUrls[i];
+
+    // Add slide to the presentation
+    const slideObj = pptx.addSlide();
+slideObj.background = { color: "3c78d8" };
+    if (imageUrl) {
+      // Add image to the slide
+      slideObj.addImage({ path: imageUrl, x: 0, y: 0, w: 5, h: 5.63  });
+    }
+
+    if (caption) {
+      // Add caption to the slide
+      slideObj.addText(caption, { x: 5.01, y: 0.2, w: 5, h: 0.81, fontSize: 32, align: 'center', color: 'ffffff' });
+    }
+
+    if (slide.content) {
+      // Add content to the slide
+      slideObj.addText(slide.content, { x: 5.01, y: 0.94, w: 5, h: 4.41, fontSize: 18, align: 'center', color: 'ffffff' });
+    }
+  }
+
+  // Save the presentation as a file
+  pptx.writeFile({ fileName: 'presentation.pptx' });
+
+  // Redirect to the viewer
+ 
+}
+  </script>
+
+</body>
+</div></div>
+</html>
